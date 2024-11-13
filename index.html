@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizz en ligne</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .answers {
+            margin-top: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quizz en ligne</h1>
+    <form id="quizForm">
+        <!-- Questions du quiz -->
+        <div class="question">
+            <label>1. Quel est le capital de la France ?</label><br>
+            <input type="text" id="q1" required><br>
+        </div>
+        <div class="question">
+            <label>2. Quelle est la plus grande planète du système solaire ?</label><br>
+            <input type="text" id="q2" required><br>
+        </div>
+        <div class="question">
+            <label>3. Qui a écrit 'Les Misérables' ?</label><br>
+            <input type="text" id="q3" required><br>
+        </div>
+        <div class="question">
+            <label>4. Quelle est la formule chimique de l'eau ?</label><br>
+            <input type="text" id="q4" required><br>
+        </div>
+        <div class="question">
+            <label>5. Quelle est la monnaie utilisée aux États-Unis ?</label><br>
+            <input type="text" id="q5" required><br>
+        </div>
+        <div class="question">
+            <label>6. Combien de continents y a-t-il sur Terre ?</label><br>
+            <input type="text" id="q6" required><br>
+        </div>
+        <div class="question">
+            <label>7. Quelle est la langue officielle du Brésil ?</label><br>
+            <input type="text" id="q7" required><br>
+        </div>
+        <div class="question">
+            <label>8. Quelle est la capitale du Japon ?</label><br>
+            <input type="text" id="q8" required><br>
+        </div>
+        <div class="question">
+            <label>9. Qui a peint la Joconde ?</label><br>
+            <input type="text" id="q9" required><br>
+        </div>
+        <div class="question">
+            <label>10. Quel est l'animal le plus rapide sur Terre ?</label><br>
+            <input type="text" id="q10" required><br>
+        </div>
+
+        <button type="submit">Envoyer mes réponses</button>
+    </form>
+
+    <button id="showAnswersBtn">Afficher les réponses</button>
+
+    <div class="answers" id="answersDisplay"></div>
+
+    <script>
+        const form = document.getElementById('quizForm');
+        const showAnswersBtn = document.getElementById('showAnswersBtn');
+        const answersDisplay = document.getElementById('answersDisplay');
+
+        // Générer un ID utilisateur unique (ici simple basé sur le timestamp)
+        const userId = 'user-' + new Date().getTime();
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Récupérer les réponses du formulaire
+            const answers = {
+                q1: document.getElementById('q1').value,
+                q2: document.getElementById('q2').value,
+                q3: document.getElementById('q3').value,
+                q4: document.getElementById('q4').value,
+                q5: document.getElementById('q5').value,
+                q6: document.getElementById('q6').value,
+                q7: document.getElementById('q7').value,
+                q8: document.getElementById('q8').value,
+                q9: document.getElementById('q9').value,
+                q10: document.getElementById('q10').value
+            };
+
+            // Envoyer les réponses au serveur
+            fetch('http://localhost:3000/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId, answers })
+            }).then(response => response.json())
+              .then(data => {
+                  console.log(data.message);
+                  alert('Réponses envoyées avec succès !');
+              }).catch(error => {
+                  console.error('Erreur:', error);
+              });
+        });
+
+        // Afficher les réponses des utilisateurs
+        showAnswersBtn.addEventListener('click', function() {
+            fetch('http://localhost:3000/showAnswers')
+                .then(response => response.json())
+                .then(data => {
+                    answersDisplay.innerHTML = '<h2>Réponses des utilisateurs :</h2>';
+                    for (const [userId, userAnswers] of Object.entries(data)) {
+                        answersDisplay.innerHTML += `<p><strong>${userId} :</strong><br>${JSON.stringify(userAnswers)}</p>`;
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        });
+    </script>
+</body>
+</html>
